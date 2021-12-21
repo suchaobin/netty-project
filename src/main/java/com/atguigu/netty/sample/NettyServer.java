@@ -2,6 +2,7 @@ package com.atguigu.netty.sample;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -37,6 +38,16 @@ public class NettyServer {
             System.out.println("服务器已就绪~");
             // 绑定端口
             ChannelFuture channelFuture = serverBootstrap.bind(6666).sync();
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (channelFuture.isSuccess()) {
+                        System.err.println("监听端口6666成功");
+                        return;
+                    }
+                    System.err.println("监听端口6666失败");
+                }
+            });
             // 这里只是监听，使主线程wait等待，只有关闭通道时才进行处理，这句话不是直接关闭了通道
             channelFuture.channel().closeFuture().sync();
         } finally {

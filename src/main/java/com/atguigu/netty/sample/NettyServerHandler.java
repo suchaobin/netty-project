@@ -2,10 +2,7 @@ package com.atguigu.netty.sample;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +58,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error(cause.getMessage(), cause);
         // 关闭通道
-        ctx.close();
+        ChannelFuture channelFuture = ctx.close();
+        channelFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (channelFuture.isSuccess()) {
+                    // 执行具体的业务...，比如这个人掉线了，我要通知他的好友们：您的好友xxx已下线
+                }
+            }
+        });
+        // 除了用在这里外，还可以用在客户端发起连接的时候，判断连接是否成功建立，如果没有连接成功，则尝试重新连接
     }
 }
