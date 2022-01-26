@@ -32,7 +32,7 @@ public class NettyClient {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new StringEncoder());
                             pipeline.addLast(new StringDecoder());
-                            pipeline.addLast(new ClientHandler());
+                            pipeline.addLast(new Pinger());
                         }
                     });
             // 启动

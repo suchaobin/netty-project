@@ -2,6 +2,7 @@ package com.atguigu.netty.heartbeat;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
@@ -10,40 +11,17 @@ import io.netty.handler.timeout.IdleStateEvent;
  * @date 2021/12/31 4:40 PM
  **/
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-    /**
-     * 对 空闲事件 的处理
-     *
-     * @param ctx 上下文
-     * @param evt 传递过来的事件
-     * @throws Exception
-     */
-    private int list[] = new int[3];
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent event) {
-            int index = -1;
-            String eventType = null;
-            switch (event.state()) {
-                case READER_IDLE:
-                    index = 0;
-                    break;
-                case WRITER_IDLE:
-                    index = 1;
-                    break;
-                case ALL_IDLE:
-                    index = 2;
-                    break;
-                default:
-                    break;
+            IdleState state = event.state();
+            if (state == IdleState.READER_IDLE) {
+                // 在规定时间内没有收到客户端的上行数据, 主动断开连接
+                ctx.disconnect();
             }
-            list[index]++;
-            System.out.println("[超时事件] " + ctx.channel().remoteAddress() + " 发生了 " + eventType + "---第" + list[index] + "次");
-            System.out.println("服务器进行相应处理");
-            if (list[index] >= 3) {
-                ctx.channel().close();
-                System.out.println("关闭该通道");
-            }
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 }
