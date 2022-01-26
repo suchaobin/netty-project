@@ -26,7 +26,7 @@ public class Pinger extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         this.channel = ctx.channel();
-
+        ping(channel);
     }
 
     private void ping(Channel channel) {
